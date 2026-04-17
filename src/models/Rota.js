@@ -3,7 +3,7 @@ const sequelize = require('../database');
 const Setor = require('./Setor');
 
 const Rota = sequelize.define('Rota', {
-    id: { type: DataTypes.UUID, defaultValues: DataTypes.UUIDV4, primaryKey: true},
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     nome: { type: DataTypes.STRING, allowNull: false },
     grau: { type: DataTypes.STRING, allowNull: false },
     corAgarras: { type: DataTypes.STRING, allowNull: false },
