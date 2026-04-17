@@ -1,7 +1,7 @@
 ## 🔒 Autenticação (JWT)
 Todas as rotas `/api/rotas` são protegidas. Faça o login para obter o Token.
 * **POST /api/auth/login**
-  * Body: `{ "email": "admin@escalada.com", "senha": "123456" }`
+  * Body: `{ "email": "admin@ginasioescalada.com", "senha": --- }`
   * Passe o token recebido no header: `Authorization: Bearer <SEU_TOKEN>`
 
 ## 🔍 Paginação, Filtros e Ordenação
