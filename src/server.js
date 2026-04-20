@@ -23,7 +23,7 @@ app.use('/api/rotas', authMiddleware, rotaRoutes);
 
 const iniciarServidor = async () => {
     try {
-        await sequelize.sync;
+        await sequelize.sync({ force: true });
 
         // Criação Admin
         const senhaHash = await bcrypt.hash('hfali7ta@gf!', 10);
