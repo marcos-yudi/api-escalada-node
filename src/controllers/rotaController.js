@@ -9,18 +9,18 @@ exports.criarRota = async (req, res) => {
         const novaRota = await Rota.create(req.body);
         return res.status(201).json(novaRota);
     } catch (error) {
-        return res.statuss(500).json({ erro: 'Erro ao criar rota.'});
+        return res.status(500).json({ erro: 'Erro ao criar rota.' });
     }
 };
 
 //READ (Com paginação, filtros e JOIN)
 exports.listarRotas = async (req, res) => {
     try {
-        const { page = 1, limit = 10, grau, sortBy ='nome', order = 'ASC' } = req.query;
-        const offset = (page -1) * limit;
+        const { page = 1, limit = 10, grau, sortBy = 'nome', order = 'ASC' } = req.query;
+        const offset = (page - 1) * limit;
 
         const whereClause = {};
-        if(grau) whereClause.grau = grau;
+        if (grau) whereClause.grau = grau;
 
         const rotas = await Rota.findAndCountAll({
             where: whereClause,
@@ -36,7 +36,7 @@ exports.listarRotas = async (req, res) => {
             paginaAtual: parseInt(page),
             dados: rotas.rows
         });
-    } catch(error) {
+    } catch (error) {
         return res.status(500).json({ erro: 'Erro ao buscar rotas.' });
     }
 };
@@ -48,18 +48,18 @@ exports.atualizarRota = async (req, res) => {
         const rota = await Rota.findByPk(req.params.id);
 
         // 2. Se não encontrar, retorna erro 404
-        if(!rota) {
-            return res.status(404).json({ mensagem: 'Rota não encontrada.'});
+        if (!rota) {
+            return res.status(404).json({ mensagem: 'Rota não encontrada.' });
         }
 
         // 3. Se encontrar, atualiza a rota com os dados novos que vieram no body
-        await rota.status(200).json(rota);
+        await rota.update(req.body);
 
         // 4. Retorna a rota atualizada com status 200 (OK)
         return res.status(200).json(rota);
 
-    } catch(error) {
-        return res.status(500).json({ erro: 'Erro ao atualizar a rota.'});
+    } catch (error) {
+        return res.status(500).json({ erro: 'Erro ao atualizar a rota.' });
     }
 };
 
@@ -67,10 +67,10 @@ exports.atualizarRota = async (req, res) => {
 exports.deletarRota = async (req, res) => {
     try {
         const rota = await Rota.findByPk(req.params.id);
-        if(!rota) return res.status(404).json({ mensagem: 'Rota não encontrada'});
+        if (!rota) return res.status(404).json({ mensagem: 'Rota não encontrada' });
         await rota.destroy();
         return res.status(204).send();
-    } catch(error) {
-        return res.status(500).json({ erro: 'Erro ao deletar'});
+    } catch (error) {
+        return res.status(500).json({ erro: 'Erro ao deletar' });
     }
 };

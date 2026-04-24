@@ -1,5 +1,7 @@
 const express = require('express');
 const rotaController = require('../controllers/rotaController');
+
+
 const router = express.Router();
 
 router.post('/', rotaController.criarRota);
