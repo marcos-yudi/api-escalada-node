@@ -3,12 +3,22 @@
 const Rota = require('../models/Rota');
 const Setor = require('../models/Setor');
 
+// Importar o validationResult
+const { validationResult } = require('express-validator');
+
 // CREATE
 exports.criarRota = async (req, res) => {
+    // Checar se a requisição passou nas validações da rota
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+        return res.status(400).json({ erros: erros.array() });
+    }
+
     try {
         const novaRota = await Rota.create(req.body);
         return res.status(201).json(novaRota);
     } catch (error) {
+        console.error('Erro ao criar rota:', error); // Log para debug
         return res.status(500).json({ erro: 'Erro ao criar rota.' });
     }
 };
@@ -17,14 +27,17 @@ exports.criarRota = async (req, res) => {
 exports.listarRotas = async (req, res) => {
     try {
         const { page = 1, limit = 10, grau, sortBy = 'nome', order = 'ASC' } = req.query;
-        const offset = (page - 1) * limit;
+
+        // Limite paginação 50.
+        const limiteSeguro = Math.min(parseInt(limit), 50);
+        const offset = (page - 1) * limitSeguro;
 
         const whereClause = {};
         if (grau) whereClause.grau = grau;
 
         const rotas = await Rota.findAndCountAll({
             where: whereClause,
-            limit: parseInt(limit),
+            limit: limiteSeguro,
             offset: parseInt(offset),
             order: [[sortBy, order.toUpperCase()]],
             include: [{ model: Setor, attributes: ['nome'] }] //JOIN com a tabela de setores
@@ -32,21 +45,27 @@ exports.listarRotas = async (req, res) => {
 
         return res.status(200).json({
             totalItens: rotas.count,
-            totalPaginas: Math.ceil(rotas.count / limit),
+            totalPaginas: Math.ceil(rotas.count / limitSeguro),
             paginaAtual: parseInt(page),
             dados: rotas.rows
         });
     } catch (error) {
+        console.error('Erro ao listar rotas: ', error);
         return res.status(500).json({ erro: 'Erro ao buscar rotas.' });
     }
 };
 
 // UPDATE
 exports.atualizarRota = async (req, res) => {
-    try {
-        // 1. Busca a rota pelo ID passado na URL
-        const rota = await Rota.findByPk(req.params.id);
+    // Validação Update
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+        return res.status(400).json({ erros: erros.array() });
+    }
 
+    // 1. Busca a rota pelo ID passado na URL
+    try {
+        const rota = await Rota.findByPk(req.params.id);
         // 2. Se não encontrar, retorna erro 404
         if (!rota) {
             return res.status(404).json({ mensagem: 'Rota não encontrada.' });
@@ -54,23 +73,28 @@ exports.atualizarRota = async (req, res) => {
 
         // 3. Se encontrar, atualiza a rota com os dados novos que vieram no body
         await rota.update(req.body);
-
-        // 4. Retorna a rota atualizada com status 200 (OK)
         return res.status(200).json(rota);
-
     } catch (error) {
+        console.error('Erro ao atualizar rota: ', error);
         return res.status(500).json({ erro: 'Erro ao atualizar a rota.' });
     }
 };
 
 // DELETE
 exports.deletarRota = async (req, res) => {
+    //Validação
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+        return res.status(400).json({ erros: erros.array() });
+    }
+
     try {
         const rota = await Rota.findByPk(req.params.id);
         if (!rota) return res.status(404).json({ mensagem: 'Rota não encontrada' });
         await rota.destroy();
         return res.status(204).send();
     } catch (error) {
+        console.error('Erro ao deletar rota: ', error);
         return res.status(500).json({ erro: 'Erro ao deletar' });
     }
 };
